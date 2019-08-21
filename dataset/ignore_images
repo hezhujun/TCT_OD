@@ -1,0 +1,26 @@
+train:
+t08313 is ignore
+t11249 is ignore
+t19167 is ignore
+t21700 is ignore
+t22311 is ignore
+t22715 is ignore
+t23447 is ignore
+t34181 is ignore
+t36716 is ignore
+t39225 is ignore
+t40521 is ignore
+t43826 is ignore
+t48844 is ignore
+t63736 is ignore
+t64455 is ignore
+t89100 is ignore
+
+val:
+t85950 is ignore
+
+test:
+t00907 is ignore
+t58330 is ignore
+t75103 is ignore
+t85880 is ignore
