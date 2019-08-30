@@ -2,6 +2,8 @@ import argparse
 import copy
 import datetime
 import time
+import os
+from collections import defaultdict
 
 import numpy as np
 import torch
@@ -202,6 +204,8 @@ def evaluate(model, data_loader, device, epoch=None, log=None, head="", print_fr
 
     total_time = time.time() - start_time
     if log is not None:
+        for iou_type in coco_evaluator.iou_types:
+            log.log("metrics", coco_evaluator.coco_eval[iou_type].stats)
         log.log("total_time", total_time)
         if epoch is not None:
             log.commit(epoch=epoch)
@@ -231,6 +235,7 @@ def main(args):
                                   collate_fn=utils.collate_fn)
 
     coco_api = coco_utils.get_coco_api_from_dataset(dataset)
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
     model = get_model_instance(num_classes=len(coco_api.cats) + 1)
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     print("device: {}".format(device.type))
@@ -242,11 +247,10 @@ def main(args):
 
     log = Log()
     log_eval = Log(log_dir="log/eval")
-    model_path_manager = ModelPathManager()
+    model_path_manager = ModelPathManager(max_file_path_size=0)
 
     latest_model_path = model_path_manager.latest_model_path()
     if latest_model_path:
-        cpu_device = torch.device("cpu")
         checkpoint = torch.load(latest_model_path)
         model.load_state_dict(checkpoint["model"], strict=False)
         model.to(device)
@@ -254,6 +258,7 @@ def main(args):
         lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
         epoch = checkpoint["epoch"] + 1
     elif args.pretrain_model:
+        print("loading model from", args.pretrain_model)
         checkpoint = torch.load(args.pretrain_model)
         if "model" in checkpoint:
             model.load_state_dict(checkpoint["model"], strict=False)
@@ -277,6 +282,7 @@ def main(args):
         }, save_path)
         model_path_manager.record_path(save_path)
 
+        evaluate(model, data_loader, device, epoch, log_eval, head="Train:")
         evaluate(model, data_loader_val, device, epoch, log_eval, head="Evaluate:")
         # engine.evaluate(model, data_loader_val, device)
 
@@ -291,12 +297,13 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", default=1, type=int)
-    parser.add_argument("--batch_size", default=2, type=int)
+    parser.add_argument("--batch-size", default=2, type=int)
     parser.add_argument("--lr", default=0.001, type=float)
     parser.add_argument("--momentum", default=0.9, type=float)
     parser.add_argument("--weight-decay", default=1e-4, type=float)
     parser.add_argument("--lr-steps", default=[30, ], nargs='+', type=int)
     parser.add_argument("--lr-gamma", default=0.1, type=float)
+    parser.add_argument("--gpus", default="")
     parser.add_argument("--pretrain-model")
     args = parser.parse_args()
     main(args)

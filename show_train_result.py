@@ -4,7 +4,7 @@ import numpy as np
 from _utils.log_utils import *
 
 if __name__ == '__main__':
-    entities = load_log_entities("log/train-1566197435.dat")
+    entities = load_log_entities("log/train-1566634187.dat")
     key_dict = extract_values(entities, "iteration", "epoch", "loss", "loss_classifier", "loss_box_reg",
                               "loss_objectness", "loss_rpn_box_reg")
     iteration = np.array(key_dict["iteration"])
@@ -39,5 +39,6 @@ if __name__ == '__main__':
     plt.show()
 
     key_dict = extract_values(entities, "epoch", "total_time")
-    plt.plot(key_dict["epoch"], key_dict["total_time"])
+    plt.plot(key_dict["epoch"], key_dict["total_time"], label="total_time")
+    plt.legend()
     plt.show()
