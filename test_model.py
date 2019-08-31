@@ -21,9 +21,10 @@ from dataset import TCTDataset
 import engine
 
 from tct_train import *
+from result_recorder import ResultRecorder
 
 
-def main(args):
+def test_model(args):
     dataset = TCTDataset(
         "/run/media/hezhujun/DATA1/Document/dataset/TCT_DATASET/JPEGImages", "dataset/train.json",
         get_transforms(False))
@@ -54,9 +55,15 @@ def main(args):
         model.load_state_dict(checkpoint, strict=False)
     model.to(device)
 
+    rr = ResultRecorder("dataset/tct_result_train.json")
     evaluate(model, data_loader, device, None, None, head="Train:")
-    # evaluate(model, data_loader_val, device, None, None, head="Eval:")
-    # evaluate(model, data_loader_test, device, None, None, head="Test :")
+    rr.save()
+    # rr = ResultRecorder("dataset/tct_result_val.json")
+    # evaluate(model, data_loader_val, device, None, None, head="Eval:", result_recorder=rr)
+    # rr.save()
+    rr = ResultRecorder("dataset/tct_result_test.json")
+    evaluate(model, data_loader_test, device, None, None, head="Test :")
+    rr.save()
 
 
 if __name__ == '__main__':
@@ -71,4 +78,4 @@ if __name__ == '__main__':
     parser.add_argument("--gpus", default="")
     parser.add_argument("--pretrain-model")
     args = parser.parse_args()
-    main(args)
+    test_model(args)

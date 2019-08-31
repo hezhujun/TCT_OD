@@ -3,6 +3,7 @@ import xml.dom.minidom
 import json
 import argparse
 
+import metadata
 
 def _load_images(path):
     files = []
@@ -112,27 +113,17 @@ _license = {
     "url": ""
 }
 
-_categories = ["adenocarcinoma",
-               "agc",
-               "asch",
-               "ascus",
-               "dysbacteriosis",
-               "hsil",
-               "lsil",
-               "monilia",
-               "normal",
-               "vaginalis"]
+_categories = metadata.categories
+cat2id = metadata.cat2id
 
 categories = [
     {
-        "id": idx + 1,
+        "id": cat2id[name],
         "name": name,
         "supercategory": ""
     }
-    for idx, name in enumerate(_categories)
+    for name in _categories
 ]
-
-cat2id = dict([(name, idx + 1) for idx, name in enumerate(_categories)])
 
 dataset = {
     "info": info,

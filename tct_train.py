@@ -127,7 +127,7 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, log, head="", 
 
 
 @torch.no_grad()
-def evaluate(model, data_loader, device, epoch=None, log=None, head="", print_freq=1):
+def evaluate(model, data_loader, device, epoch=None, log=None, head="", print_freq=1, result_recorder=None):
     space_fmt = ":0" + str(len(str(len(data_loader)))) + "d"
     log_msg = "  ".join([
         head,
@@ -165,6 +165,8 @@ def evaluate(model, data_loader, device, epoch=None, log=None, head="", print_fr
             log.log("model_time", model_time)
 
         res = {target["image_id"].item(): output for target, output in zip(targets, outputs)}
+        if result_recorder is not None:
+            result_recorder.add(res)
         evaluator_time = time.time()
         coco_evaluator.update(res)
         evaluator_time = time.time() - evaluator_time
@@ -246,6 +248,7 @@ def main(args):
     epoch = 0
 
     log = Log()
+    log_train = Log(log_dir="log/train")
     log_eval = Log(log_dir="log/eval")
     model_path_manager = ModelPathManager(max_file_path_size=0)
 
@@ -282,7 +285,7 @@ def main(args):
         }, save_path)
         model_path_manager.record_path(save_path)
 
-        evaluate(model, data_loader, device, epoch, log_eval, head="Train:")
+        evaluate(model, data_loader, device, epoch, log_train, head="Train:")
         evaluate(model, data_loader_val, device, epoch, log_eval, head="Evaluate:")
         # engine.evaluate(model, data_loader_val, device)
 
