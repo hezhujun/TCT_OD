@@ -1,15 +1,12 @@
 import argparse
 import copy
 import datetime
-import time
 import os
-from collections import defaultdict
+import time
 
 import numpy as np
 import torch
-import torchvision
 from torch.utils.data.dataloader import DataLoader
-from torchvision.models.detection.backbone_utils import BackboneWithFPN
 
 import coco_eval
 import coco_utils
@@ -18,7 +15,7 @@ import utils
 from _utils.log_utils import Log
 from _utils.model_path_manager import ModelPathManager
 from dataset import TCTDataset
-import engine
+from model import *
 
 
 def get_transforms(train):
@@ -28,24 +25,6 @@ def get_transforms(train):
     if train:
         transforms.append(T.RandomHorizontalFlip(0.5))
     return T.Compose(transforms)
-
-
-def get_model_instance(num_classes):
-    resent50 = torchvision.models.resnet50(pretrained=False)
-    return_layers = {'layer1': 0, 'layer2': 1, 'layer3': 2, 'layer4': 3}
-
-    in_channels_stage2 = resent50.inplanes // 8
-    in_channels_list = [
-        in_channels_stage2,
-        in_channels_stage2 * 2,
-        in_channels_stage2 * 4,
-        in_channels_stage2 * 8,
-    ]
-    out_channels = 256
-    backbone = BackboneWithFPN(resent50, return_layers, in_channels_list, out_channels)
-    model = torchvision.models.detection.FasterRCNN(backbone, num_classes, image_mean=[0.5, 0.5, 0.5],
-                                                    image_std=[1, 1, 1])
-    return model
 
 
 def train_one_epoch(model, optimizer, data_loader, device, epoch, log, head="", print_freq=1):
@@ -301,10 +280,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", default=1, type=int)
     parser.add_argument("--batch-size", default=2, type=int)
-    parser.add_argument("--lr", default=0.001, type=float)
+    parser.add_argument("--lr", default=0.005, type=float)
     parser.add_argument("--momentum", default=0.9, type=float)
     parser.add_argument("--weight-decay", default=1e-4, type=float)
-    parser.add_argument("--lr-steps", default=[30, ], nargs='+', type=int)
+    parser.add_argument("--lr-steps", default=[50, ], nargs='+', type=int)
     parser.add_argument("--lr-gamma", default=0.1, type=float)
     parser.add_argument("--gpus", default="")
     parser.add_argument("--pretrain-model")
