@@ -1,27 +1,5 @@
-import argparse
-import copy
-import datetime
-import time
-import os
-from collections import defaultdict
-
-import numpy as np
-import torch
-import torchvision
-from torch.utils.data.dataloader import DataLoader
-from torchvision.models.detection.backbone_utils import BackboneWithFPN
-
-import coco_eval
-import coco_utils
-import transforms as T
-import utils
-from _utils.log_utils import Log
-from _utils.model_path_manager import ModelPathManager
-from dataset import TCTDataset
-import engine
-
-from tct_train import *
 from result_recorder import ResultRecorder
+from tct_train import *
 
 
 def test_model(args):
@@ -35,7 +13,7 @@ def test_model(args):
         "/run/media/hezhujun/DATA1/Document/dataset/TCT_DATASET/JPEGImages", "dataset/test.json",
         get_transforms(False))
     data_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=4,
-                                 collate_fn=utils.collate_fn)
+                             collate_fn=utils.collate_fn)
     data_loader_val = DataLoader(dataset_val, batch_size=args.batch_size, shuffle=False, num_workers=4,
                                  collate_fn=utils.collate_fn)
     data_loader_test = DataLoader(dataset_test, batch_size=args.batch_size, shuffle=False, num_workers=4,
@@ -56,13 +34,13 @@ def test_model(args):
     model.to(device)
 
     rr = ResultRecorder("dataset/tct_result_train.json")
-    evaluate(model, data_loader, device, None, None, head="Train:")
+    evaluate(model, data_loader, device, None, None, head="Train:", result_recorder=rr)
     rr.save()
-    # rr = ResultRecorder("dataset/tct_result_val.json")
-    # evaluate(model, data_loader_val, device, None, None, head="Eval:", result_recorder=rr)
-    # rr.save()
+    rr = ResultRecorder("dataset/tct_result_val.json")
+    evaluate(model, data_loader_val, device, None, None, head="Eval:", result_recorder=rr)
+    rr.save()
     rr = ResultRecorder("dataset/tct_result_test.json")
-    evaluate(model, data_loader_test, device, None, None, head="Test :")
+    evaluate(model, data_loader_test, device, None, None, head="Test :", result_recorder=rr)
     rr.save()
 
 
