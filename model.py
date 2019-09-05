@@ -17,27 +17,27 @@ class TwoMLPHead(nn.Module):
         super(TwoMLPHead, self).__init__()
 
         self.fc6_cls = nn.Linear(in_channels, representation_size)
-        self.fc6_dropout_cls = nn.Dropout(0.5)
+        # self.fc6_dropout_cls = nn.Dropout(0.5)
         self.fc7_cls = nn.Linear(representation_size, representation_size)
-        self.fc7_dropout_cls = nn.Dropout(0.5)
+        # self.fc7_dropout_cls = nn.Dropout(0.5)
 
         self.fc6_reg = nn.Linear(in_channels, representation_size)
-        self.fc6_dropout_reg = nn.Dropout(0.5)
+        # self.fc6_dropout_reg = nn.Dropout(0.5)
         self.fc7_reg = nn.Linear(representation_size, representation_size)
-        self.fc7_dropout_reg = nn.Dropout(0.5)
+        # self.fc7_dropout_reg = nn.Dropout(0.5)
 
     def forward(self, x):
         x = x.flatten(start_dim=1)
 
         x_cls = F.relu(self.fc6_cls(x))
-        x_cls = self.fc6_dropout_cls(x_cls)
+        # x_cls = self.fc6_dropout_cls(x_cls)
         x_cls = F.relu(self.fc7_cls(x_cls))
-        x_cls = self.fc7_dropout_cls(x_cls)
+        # x_cls = self.fc7_dropout_cls(x_cls)
 
         x_reg = F.relu(self.fc6_reg(x))
-        x_reg = self.fc6_dropout_reg(x_reg)
+        # x_reg = self.fc6_dropout_reg(x_reg)
         x_reg = F.relu(self.fc7_reg(x_reg))
-        x_reg = self.fc7_dropout_reg(x_reg)
+        # x_reg = self.fc7_dropout_reg(x_reg)
 
         return x_cls, x_reg
 
@@ -63,7 +63,7 @@ class RCNNPredictor(nn.Module):
 
 
 def get_model_instance(num_classes):
-    resent50 = resnet50(pretrained=False)
+    resent50 = resnet50(pretrained=True)
     return_layers = {'layer1': 0, 'layer2': 1, 'layer3': 2, 'layer4': 3}
 
     in_channels_stage2 = resent50.inplanes // 8
@@ -81,12 +81,11 @@ def get_model_instance(num_classes):
         sampling_ratio=2)
 
     resolution = box_roi_pool.output_size[0]
-    representation_size = 1024
+    representation_size = 256
     box_head = TwoMLPHead(
         out_channels * resolution ** 2,
         representation_size)
 
-    representation_size = 1024
     box_predictor = RCNNPredictor(
         representation_size,
         num_classes)

@@ -274,6 +274,7 @@ if __name__ == '__main__':
     parser.add_argument("--image-root", default="/run/media/hezhujun/DATA1/Document/dataset/TCT_DATASET/JPEGImages")
     parser.add_argument("--epochs", default=1, type=int)
     parser.add_argument("--batch-size", default=2, type=int)
+    parser.add_argument("--batch-size-per-gpu", default=2, type=int)
     parser.add_argument("--lr", default=0.005, type=float)
     parser.add_argument("--momentum", default=0.9, type=float)
     parser.add_argument("--weight-decay", default=1e-4, type=float)

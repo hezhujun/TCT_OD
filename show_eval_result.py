@@ -4,7 +4,7 @@ import numpy as np
 from _utils.log_utils import *
 
 if __name__ == '__main__':
-    entities = load_log_entities("log/train/train-1567241396.dat")
+    entities = load_log_entities("log/train/train-1567390790.dat")
     key_dict = extract_values(entities, "epoch", "metrics")
     metrics = key_dict["metrics"]
     epoch = key_dict["epoch"]
@@ -20,3 +20,4 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
     print(np.argmax(AP2))
+    print(metrics[-1])
