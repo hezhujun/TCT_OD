@@ -3,15 +3,9 @@ from tct_train import *
 
 
 def test_model(args):
-    dataset = TCTDataset(
-        "/run/media/hezhujun/DATA1/Document/dataset/TCT_DATASET/JPEGImages", "dataset/train.json",
-        get_transforms(False))
-    dataset_val = TCTDataset(
-        "/run/media/hezhujun/DATA1/Document/dataset/TCT_DATASET/JPEGImages", "dataset/val.json",
-        get_transforms(False))
-    dataset_test = TCTDataset(
-        "/run/media/hezhujun/DATA1/Document/dataset/TCT_DATASET/JPEGImages", "dataset/test.json",
-        get_transforms(False))
+    dataset = TCTDataset(args.image_root, "dataset/train.json", get_transforms(False))
+    dataset_val = TCTDataset(args.image_root, "dataset/val.json", get_transforms(False))
+    dataset_test = TCTDataset(args.image_root, "dataset/test.json", get_transforms(False))
     data_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=4,
                              collate_fn=utils.collate_fn)
     data_loader_val = DataLoader(dataset_val, batch_size=args.batch_size, shuffle=False, num_workers=4,
@@ -46,6 +40,7 @@ def test_model(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument("--image-root", default="/run/media/hezhujun/DATA1/Document/dataset/TCT_DATASET/JPEGImages")
     parser.add_argument("--epochs", default=1, type=int)
     parser.add_argument("--batch-size", default=2, type=int)
     parser.add_argument("--lr", default=0.001, type=float)

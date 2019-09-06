@@ -4,7 +4,7 @@ import numpy as np
 from _utils.log_utils import *
 
 if __name__ == '__main__':
-    entities = load_log_entities("log/train-1567390790.dat")
+    entities = load_log_entities("log/train-1567582236.dat")
     key_dict = extract_values(entities, "iteration", "epoch", "loss", "loss_classifier", "loss_box_reg",
                               "loss_objectness", "loss_rpn_box_reg")
     iteration = np.array(key_dict["iteration"])
